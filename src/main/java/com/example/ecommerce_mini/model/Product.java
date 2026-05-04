@@ -25,7 +25,7 @@ public class Product {
     @Column(length = 1000)
     private String description;
     
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false)
     private Double price;
     
     @Column(name = "stock_quantity", nullable = false)

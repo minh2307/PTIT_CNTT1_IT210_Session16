@@ -10,6 +10,8 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     
+    List<Order> findByCustomerEmailOrderByOrderDateDesc(String customerEmail);
+    
     @Query("SELECT COALESCE(SUM(o.totalAmount), 0.0) FROM Order o WHERE o.status NOT IN ('CANCELLED')")
     Double findTotalRevenue();
     

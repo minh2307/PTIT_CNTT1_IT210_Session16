@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.name}">Chi tiết sản phẩm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/header-client :: header}"></div>
+    
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Product Images -->
+            <div class="col-md-6">
+                <div class="product-image-main">
+                    <img th:if="${product.imageUrl}" 
+                         th:src="${product.imageUrl}" 
+                         class="img-fluid rounded shadow" 
+                         th:alt="${product.name}">
+                    <div th:unless="${product.imageUrl}" 
+                         class="bg-light rounded d-flex align-items-center justify-content-center" 
+                         style="height: 400px;">
+                        <div class="text-center">
+                            <i class="fas fa-image fa-4x text-muted mb-3"></i>
+                            <p class="text-muted">Không có hình ảnh</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Product Info -->
+            <div class="col-md-6">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a href="/products">Sản phẩm</a></li>
+                        <li class="breadcrumb-item active" th:text="${product.name}"></li>
+                    </ol>
+                </nav>
+                
+                <h1 class="h3 mb-3" th:text="${product.name}"></h1>
+                
+                <div class="mb-3">
+                    <span class="badge bg-secondary me-2" th:text="${product.category.name}"></span>
+                    <span class="badge" 
+                          th:classappend="${product.stockQuantity > 10 ? 'bg-success' : (product.stockQuantity > 0 ? 'bg-warning' : 'bg-danger')}"
+                          th:text="${product.stockQuantity > 0 ? product.stockQuantity + ' trong kho' : 'Hết hàng'}">
+                    </span>
+                </div>
+                
+                <div class="price-section mb-4">
+                    <h2 class="text-primary mb-0" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></h2>
+                </div>
+                
+                <div class="product-description mb-4">
+                    <h5>Mô tả sản phẩm</h5>
+                    <p class="text-muted" th:text="${product.description ?: 'Không có mô tả'}"></p>
+                </div>
+                
+                <div class="product-meta mb-4">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Mã sản phẩm:</small>
+                            <p class="mb-2" th:text="'#' + ${product.id}"></p>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Ngày thêm:</small>
+                            <p class="mb-2" th:text="${#temporals.format(product.createdAt, 'dd/MM/yyyy')}"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons mb-4">
+                    <div class="row g-2">
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <button class="btn btn-outline-secondary" type="button" id="decreaseQty">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" class="form-control text-center" id="quantity" value="1" min="1" th:max="${product.stockQuantity}">
+                                <button class="btn btn-outline-secondary" type="button" id="increaseQty">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-primary w-100" id="addToCartBtn" 
+                                    th:disabled="${product.stockQuantity == 0}">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span th:text="${product.stockQuantity > 0 ? 'Thêm vào giỏ' : 'Hết hàng'}"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-info-cards">
+                    <div class="card mb-2">
+                        <div class="card-body py-2">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-truck text-primary me-3"></i>
+                                <div>
+                                    <small class="text-muted d-block">Giao hàng</small>
+                                    <span class="fw-semibold">Miễn phí vận chuyển đơn từ 500k</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body py-2">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-shield-alt text-primary me-3"></i>
+                                <div>
+                                    <small class="text-muted d-block">Bảo hành</small>
+                                    <span class="fw-semibold">Bảo hành chính hãng 12 tháng</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Related Products -->
+        <div th:if="${relatedProducts != null and !#lists.isEmpty(relatedProducts)}" class="mt-5">
+            <h3 class="mb-4">Sản phẩm liên quan</h3>
+            <div class="row">
+                <div th:each="relatedProduct : ${relatedProducts}" class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card h-100">
+                        <div class="product-image-container">
+                            <img th:if="${relatedProduct.imageUrl}" 
+                                 th:src="${relatedProduct.imageUrl}" 
+                                 class="card-img-top" 
+                                 style="height: 150px; object-fit: cover;"
+                                 th:alt="${relatedProduct.name}">
+                            <div th:unless="${relatedProduct.imageUrl}" 
+                                 class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                 style="height: 150px;">
+                                <i class="fas fa-image text-muted"></i>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title text-truncate" th:text="${relatedProduct.name}"></h6>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-primary" 
+                                      th:text="${#numbers.formatDecimal(relatedProduct.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
+                                </span>
+                                <a th:href="@{/products/{id}(id=${relatedProduct.id})}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    Xem
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{fragments/footer-client :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const decreaseBtn = document.getElementById('decreaseQty');
+            const increaseBtn = document.getElementById('increaseQty');
+            const quantityInput = document.getElementById('quantity');
+            const addToCartBtn = document.getElementById('addToCartBtn');
+            const maxQuantity = parseInt(quantityInput.getAttribute('max'));
+            
+            decreaseBtn.addEventListener('click', function() {
+                let currentValue = parseInt(quantityInput.value);
+                if (currentValue > 1) {
+                    quantityInput.value = currentValue - 1;
+                }
+            });
+            
+            increaseBtn.addEventListener('click', function() {
+                let currentValue = parseInt(quantityInput.value);
+                if (currentValue < maxQuantity) {
+                    quantityInput.value = currentValue + 1;
+                }
+            });
+            
+            addToCartBtn.addEventListener('click', function() {
+                const quantity = parseInt(quantityInput.value);
+                const productId = window.location.pathname.split('/').pop();
+                
+                // Add to cart functionality will be implemented later
+                alert('Thêm vào giỏ hàng chức năng sẽ được cập nhật sau!');
+            });
+        });
+    </script>
+    
+    <style>
+        .product-image-main img {
+            transition: transform 0.3s ease;
+        }
+        .product-image-main:hover img {
+            transform: scale(1.05);
+        }
+        .product-image-container {
+            position: relative;
+            overflow: hidden;
+        }
+        .product-image-container img {
+            transition: transform 0.3s ease;
+        }
+        .product-image-container:hover img {
+            transform: scale(1.1);
+        }
+    </style>
+</body>
+</html>

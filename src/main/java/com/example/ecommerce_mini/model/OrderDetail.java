@@ -19,8 +19,8 @@ public class OrderDetail {
     @Column(nullable = false)
     private Integer quantity;
     
-    @Column(name = "unit_price", nullable = false, precision = 10, scale = 2)
-    private Double unitPrice;
+    @Column(name = "price", nullable = false)
+    private Double price;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)

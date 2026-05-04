@@ -22,13 +22,22 @@ public class Order {
     @Column(name = "customer_name", nullable = false, length = 100)
     private String customerName;
     
-    @Column(nullable = false, length = 20)
-    private String phone;
+    @Column(name = "customer_email", nullable = false, length = 100)
+    private String customerEmail;
     
-    @Column(nullable = false, length = 255)
-    private String address;
+    @Column(name = "customer_phone", nullable = false, length = 20)
+    private String customerPhone;
     
-    @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
+    @Column(name = "shipping_address", nullable = false, length = 255)
+    private String shippingAddress;
+    
+    @Column(name = "payment_method", nullable = false, length = 50)
+    private String paymentMethod;
+    
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+    
+    @Column(name = "total_amount", nullable = false)
     private Double totalAmount;
     
     @Column(name = "order_date", nullable = false)
@@ -46,6 +55,6 @@ public class Order {
     private List<OrderDetail> orderDetails;
     
     public enum OrderStatus {
-        PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED
+        PENDING, CONFIRMED, SHIPPING, DELIVERED, CANCELLED
     }
 }
